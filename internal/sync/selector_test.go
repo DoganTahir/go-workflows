@@ -8,7 +8,7 @@ import (
 
 func Test_FutureSelector_SelectWaits(t *testing.T) {
 	ctx := Background()
-	f := NewFuture()
+	f := NewFuture[int]()
 	reachedEnd := false
 
 	cr := NewCoroutine(ctx, func(ctx Context) error {

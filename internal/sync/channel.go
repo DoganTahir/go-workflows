@@ -5,14 +5,14 @@ import (
 	"github.com/pkg/errors"
 )
 
-type Channel interface {
-	Send(ctx Context, v interface{})
+type Channel[T any] interface {
+	Send(ctx Context, v T)
 
-	SendNonblocking(ctx Context, v interface{}) (ok bool)
+	SendNonblocking(ctx Context, v T) (ok bool)
 
-	Receive(ctx Context, vptr interface{}) (more bool)
+	Receive(ctx Context) (v T, more bool)
 
-	ReceiveNonblocking(ctx Context, vptr interface{}) (more bool)
+	ReceiveNonblocking(ctx Context) (v T, more bool)
 
 	Close()
 }
@@ -25,25 +25,25 @@ type ChannelInternal interface {
 	AddReceiveCallback(cb func(v interface{}))
 }
 
-func NewChannel() Channel {
-	return &channel{
-		c:         make([]interface{}, 0),
+func NewChannel[T any]() Channel[T] {
+	return &channel[T]{
+		c:         make([]T, 0),
 		converter: converter.DefaultConverter,
 	}
 }
 
-func NewBufferedChannel(size int) Channel {
-	return &channel{
-		c:         make([]interface{}, 0, size),
+func NewBufferedChannel[T any](size int) Channel[T] {
+	return &channel[T]{
+		c:         make([]T, 0, size),
 		size:      size,
 		converter: converter.DefaultConverter,
 	}
 }
 
-type channel struct {
-	c         []interface{}
-	receivers []func(interface{})
-	senders   []func() interface{}
+type channel[T any] struct {
+	c         []T
+	receivers []func(T)
+	senders   []func() T
 	closed    bool
 	size      int
 	converter converter.Converter
