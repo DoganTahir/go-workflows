@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Test_Yields(t *testing.T) {
+func Test_FutureYields(t *testing.T) {
 	f := NewFuture[int]()
 
 	c := NewCoroutine(Background(), func(ctx Context) error {
